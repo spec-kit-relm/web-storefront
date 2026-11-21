@@ -9,8 +9,8 @@ Owner: `@spec-kit-relm/frontend` · Spec Kit project, kind **frontend** (presets
 
 | Contract | Version (pinned) | Provider |
 |----------|------------------|----------|
-| [`contracts/vendor/inventory-api.yaml`](contracts/vendor/inventory-api.yaml) | 1.1.0 | inventory-service |
-| [`contracts/vendor/orders-api.yaml`](contracts/vendor/orders-api.yaml) | 1.3.0 | orders-service |
+| [`contracts/vendor/inventory-api.yaml`](contracts/vendor/inventory-api.yaml) | 1.1.1 | inventory-service |
+| [`contracts/vendor/orders-api.yaml`](contracts/vendor/orders-api.yaml) | 1.3.1 | orders-service |
 
 Provenance and the re-vendoring procedure: [`contracts/vendor/README.md`](contracts/vendor/README.md).
 
@@ -40,7 +40,7 @@ npm test && npm run build
 
 | Feature | Directory | Role | State |
 |---------|-----------|------|-------|
-| RELM-1 Stock reservation at checkout | [`specs/001-stock-reservation/`](specs/001-stock-reservation/) | consumer (3rd in rollout, flag `checkout.stock-reservation`) | Approved · contracts locked · [tasks](specs/001-stock-reservation/tasks.md) ready — **next: `/speckit.implement Phase 1`** |
+| RELM-2 Stock reservation at checkout | [`specs/002-stock-reservation/`](specs/002-stock-reservation/) | consumer (3rd in rollout, flag `checkout.stock-reservation`) | Approved · contracts locked · [tasks](specs/002-stock-reservation/tasks.md) ready — **next: `/speckit.implement Phase 1`** |
 
 ## Gates on every PR
 

@@ -1,16 +1,16 @@
 # Implementation Plan: Stock reservation at checkout — storefront slice
 
-**Branch**: `001-stock-reservation` | **Date**: 2026-11-20 | **Spec**: [spec.md](./spec.md)
+**Branch**: `002-stock-reservation` | **Date**: 2026-11-20 | **Spec**: [spec.md](./spec.md)
 
-**Input**: Feature specification from `/specs/001-stock-reservation/spec.md`
+**Input**: Feature specification from `/specs/002-stock-reservation/spec.md`
 
 ## Summary
 
 Behind flag `checkout.stock-reservation`, the checkout route's Server Component creates (or reuses)
-the cart's reservation via a server-side API wrapper over the generated inventory-api 1.1.0 types,
+the cart's reservation via a server-side API wrapper over the generated inventory-api 1.1.1 types,
 renders a `HoldNotice` client component (countdown from `remainingSeconds`, polite live-region
 announcements at 5 min / 1 min / 0), a `ShortageList`, and a `PlaceOrderButton` that posts through a
-Server Action to orders-api 1.3.0 with `reservationId` and a per-attempt `Idempotency-Key` kept in
+Server Action to orders-api 1.3.1 with `reservationId` and a per-attempt `Idempotency-Key` kept in
 an HTTP-only cookie. Problem types map to i18n messages.
 
 ## Technical Context
@@ -39,8 +39,8 @@ an HTTP-only cookie. Problem types map to i18n messages.
 
 | Rule | How this plan complies | Status |
 |------|------------------------|--------|
-| ORG-1/2 | RELM-1 local spec approved, technology-free | ✅ |
-| ORG-3 | consumes inventory-api 1.1.0 + orders-api 1.3.0 — vendored, locked | ✅ |
+| ORG-1/2 | RELM-2 local spec approved, technology-free | ✅ |
+| ORG-3 | consumes inventory-api 1.1.1 + orders-api 1.3.1 — vendored, locked | ✅ |
 | ORG-4 | Component tests with scenario IDs; consumer tests incl. 409/503 problems | ✅ |
 | ORG-5 | No personal data stored client-side; service token server-side only | ✅ |
 | ORG-6 | RUM timing for hold notice; analytics events (no PII) | ✅ |
@@ -55,7 +55,7 @@ an HTTP-only cookie. Problem types map to i18n messages.
 ### Documentation (this feature)
 
 ```text
-specs/001-stock-reservation/
+specs/002-stock-reservation/
 ├── plan.md  research.md  quickstart.md  tasks.md
 ```
 
@@ -88,8 +88,8 @@ src/i18n/en.ts                     new checkout.* keys
 
 | Interface | Role | Contract file | Locked version | Change | Consumers / provider |
 |-----------|------|---------------|----------------|--------|----------------------|
-| Inventory API — reservations | consumes | `contracts/vendor/inventory-api.yaml` | 1.1.0 | — | provider: inventory-service |
-| Orders API — placeOrder | consumes | `contracts/vendor/orders-api.yaml` | 1.3.0 | — | provider: orders-service |
+| Inventory API — reservations | consumes | `contracts/vendor/inventory-api.yaml` | 1.1.1 | — | provider: inventory-service |
+| Orders API — placeOrder | consumes | `contracts/vendor/orders-api.yaml` | 1.3.1 | — | provider: orders-service |
 
 ### Observability (ORG-6)
 

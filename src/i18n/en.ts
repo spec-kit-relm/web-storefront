@@ -3,7 +3,7 @@ export const en = {
   'home.title': 'Relm Store',
   'home.cta': 'Go to checkout',
   'checkout.title': 'Checkout',
-  'checkout.placeholder': 'Checkout is being rebuilt for RELM-1 (stock reservation).',
+  'checkout.placeholder': 'Checkout is being rebuilt for RELM-2 (stock reservation).',
 } as const;
 
 export type MessageKey = keyof typeof en;

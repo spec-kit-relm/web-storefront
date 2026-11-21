@@ -11,7 +11,7 @@
 
 ## Decision 3 — Idempotency key lifecycle
 - **Decision**: new UUID per *attempt* stored in the cookie when the button is first pressed; reused on retries after 503/timeouts; cleared after confirmation or `reservation-expired`.
-- **Rationale**: double-clicks and network retries hit orders-api with the same key → one order (RELM-1/US2/AS2).
+- **Rationale**: double-clicks and network retries hit orders-api with the same key → one order (RELM-2/US2/AS2).
 
 ## Decision 4 — Mocks
 - **Decision**: Prism mock servers from the vendored contracts for local dev and consumer tests; examples for 409 `insufficient-stock`, 409 `reservation-expired`, 503.

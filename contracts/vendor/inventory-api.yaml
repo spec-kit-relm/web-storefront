@@ -1,9 +1,10 @@
 openapi: 3.1.0
 info:
   title: Relm Inventory API
-  version: 1.1.0
+  version: 1.1.1
   description: |
     Stock availability and checkout reservations ("holds") for Relm Commerce.
+    1.1.1: documentation only — scenario references renumbered from RELM-1 to RELM-2.
     Owner: inventory-service (@spec-kit-relm/backend). Consumers: orders-service, web-storefront, e2e-tests.
 
     Semantics (ORG-3, BE-2):
@@ -32,7 +33,7 @@ tags:
   - name: availability
     description: Sellable units per SKU
   - name: reservations
-    description: Checkout holds (RELM-1)
+    description: Checkout holds (RELM-2)
 paths:
   /v1/items/{sku}/availability:
     get:
@@ -57,7 +58,7 @@ paths:
       tags: [reservations]
       operationId: createReservation
       summary: Hold all lines of a cart for ttlSeconds (all-or-nothing)
-      x-relm-scenarios: [RELM-1/US1/AS1, RELM-1/US1/AS2, RELM-1/US1/AS4]
+      x-relm-scenarios: [RELM-2/US1/AS1, RELM-2/US1/AS2, RELM-2/US1/AS4]
       parameters:
         - $ref: '#/components/parameters/IdempotencyKey'
         - $ref: '#/components/parameters/RequestId'
@@ -87,7 +88,7 @@ paths:
       tags: [reservations]
       operationId: getReservation
       summary: Current state and remaining time of a reservation
-      x-relm-scenarios: [RELM-1/US1/AS3, RELM-1/US3/AS2]
+      x-relm-scenarios: [RELM-2/US1/AS3, RELM-2/US3/AS2]
       parameters:
         - $ref: '#/components/parameters/ReservationId'
         - $ref: '#/components/parameters/RequestId'
@@ -106,7 +107,7 @@ paths:
       tags: [reservations]
       operationId: commitReservation
       summary: Convert an active reservation into a permanent stock deduction (idempotent)
-      x-relm-scenarios: [RELM-1/US2/AS1, RELM-1/US2/AS3]
+      x-relm-scenarios: [RELM-2/US2/AS1, RELM-2/US2/AS3]
       parameters:
         - $ref: '#/components/parameters/ReservationId'
         - $ref: '#/components/parameters/IdempotencyKey'
