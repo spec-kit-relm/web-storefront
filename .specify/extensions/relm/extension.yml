@@ -1,0 +1,44 @@
+schema_version: "1.0"
+
+extension:
+  id: "relm"
+  name: "Relm Cross-Repo Workflow"
+  version: "1.0.0"
+  description: "Relm commands for multi-repo SDD: impact maps, central-spec handoff to service repos, and PR descriptions with gate evidence."
+  category: "process"
+  effect: "read-write"
+  author: "Relm SDD Guild"
+  repository: "https://github.com/spec-kit-relm/speckit-platform"
+  license: "MIT"
+  homepage: "https://github.com/spec-kit-relm/sdd-handbook"
+
+requires:
+  speckit_version: ">=1.2.0"
+
+provides:
+  commands:
+    - name: "speckit.relm.impact"
+      file: "commands/impact.md"
+      description: "product-specs only: create impact.md and contracts.lock.md for the active product feature"
+
+    - name: "speckit.relm.handoff"
+      file: "commands/handoff.md"
+      description: "Service repos: read this repo's slice of a central product feature and prepare /speckit.specify"
+
+    - name: "speckit.relm.pr"
+      file: "commands/pr.md"
+      description: "Draft the pull-request description with Relm gate evidence (feature, contracts, analyze, converge, scenarios)"
+
+hooks:
+  after_implement:
+    command: "speckit.relm.pr"
+    optional: true
+    prompt: "Draft the Relm PR description now?"
+    description: "Collect gate evidence into the PR template"
+    condition: null
+
+tags:
+  - "relm"
+  - "multi-repo"
+  - "contracts"
+  - "traceability"

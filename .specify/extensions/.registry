@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "extensions": {
+    "git": {
+      "version": "1.0.8",
+      "source": "local",
+      "manifest_hash": "sha256:53692513178b01b0cca2d9328158fe08668b8dfa307e5e43bf86ca46ce69f19a",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.git.feature",
+          "speckit.git.validate",
+          "speckit.git.remote",
+          "speckit.git.initialize",
+          "speckit.git.commit"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-11-21T20:41:43.648187+00:00"
+    },
+    "github": {
+      "version": "1.0.6",
+      "source": "local",
+      "manifest_hash": "sha256:e77193414ff8bf39b6338df4c8f4c205e3ff108a58a181727161e3e88009bff7",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.github.taskstoissues"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-11-21T20:41:45.623336+00:00"
+    },
+    "relm": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:6e83db6135fec2c39cfcef15d27a22d87a1d3ec64e7286fd4c0750757ed9177b",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.relm.impact",
+          "speckit.relm.handoff",
+          "speckit.relm.pr"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-11-21T20:41:46.476947+00:00"
+    }
+  }
+}

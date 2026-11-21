@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "presets": {
+    "relm-org": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:010714f14f56cf3b4c31af32097e1022d69f04bd41dad2da2378225f31c25743",
+      "enabled": true,
+      "priority": 20,
+      "registered_commands": {
+        "claude": [
+          "speckit.specify",
+          "speckit.plan",
+          "speckit.tasks",
+          "speckit.implement"
+        ]
+      },
+      "registered_skills": {
+        "claude": [
+          "speckit-specify",
+          "speckit-plan",
+          "speckit-tasks",
+          "speckit-implement"
+        ]
+      },
+      "installed_at": "2026-11-21T20:41:44.382734+00:00"
+    },
+    "relm-frontend": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:24ed88b2f099628c8ab22b2f028677120ddb588c108d3056d7e9fc9614519b42",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {},
+      "registered_skills": {},
+      "installed_at": "2026-11-21T20:41:45.248287+00:00"
+    }
+  }
+}

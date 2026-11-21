@@ -1,0 +1,18 @@
+# Relm SDD gates — add to every Relm repository. Make "sdd / sdd-gates" (and "contracts /
+# contract-check" for repos with contracts/) required status checks in branch protection.
+name: sdd
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, labeled, unlabeled]
+  push:
+    branches: [main]
+
+jobs:
+  sdd:
+    uses: spec-kit-relm/speckit-platform/.github/workflows/sdd-gates.yml@v1
+    with:
+      repo-kind: frontend
+
+  contracts:
+    uses: spec-kit-relm/speckit-platform/.github/workflows/contract-check.yml@v1

@@ -1,0 +1,179 @@
+openapi: 3.1.0
+info:
+  title: Relm Orders API
+  version: 1.3.0
+  description: |
+    Order placement for Relm Commerce. Owner: orders-service (@spec-kit-relm/backend).
+    Consumers: web-storefront, e2e-tests.
+
+    Semantics (ORG-3, BE-2):
+    - `POST /v1/orders` requires `Idempotency-Key`. Repeating the request with the same key and body
+      within 24 h returns the original 201 response with the same order (RELM-1/US2/AS2). The same key
+      with a different body returns 422 `idempotency-key-reused`.
+    - 1.3.0: optional `reservationId`. When present, the order is placed only if the reservation can
+      be committed in inventory-service; otherwise 409 `reservation-expired` and no order is created
+      (RELM-1/US2/AS3). When absent, behavior is unchanged from 1.2.0.
+    - Money is integer minor units plus ISO 4217 currency (ORD-4).
+  contact:
+    name: Relm backend team
+    url: https://github.com/spec-kit-relm/orders-service
+  license:
+    name: Proprietary
+    identifier: LicenseRef-Relm
+servers:
+  - url: https://orders.internal.relm.example
+    description: production (internal)
+security:
+  - bearer: []
+tags:
+  - name: orders
+    description: Placing and reading orders
+paths:
+  /v1/orders:
+    post:
+      tags: [orders]
+      operationId: placeOrder
+      summary: Place an order (optionally against an inventory reservation)
+      x-relm-scenarios: [RELM-1/US2/AS1, RELM-1/US2/AS2, RELM-1/US2/AS3]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PlaceOrder' }
+      responses:
+        '201':
+          description: Order placed (or replayed for the same Idempotency-Key)
+          headers:
+            X-Request-Id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '409':
+          description: "`reservation-expired` (1.3.0) — reservation expired or replaced; no order created"
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /v1/orders/{orderId}:
+    get:
+      tags: [orders]
+      operationId: getOrder
+      summary: Read an order
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '200':
+          description: Order
+          headers:
+            X-Request-Id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '404':
+          description: "`not-found`"
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      description: Storefront BFF token with scope `orders:place`.
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string, format: uuid }
+    RequestId:
+      name: X-Request-Id
+      in: header
+      required: false
+      schema: { type: string }
+  headers:
+    RequestId:
+      schema: { type: string }
+  responses:
+    Unauthorized:
+      description: "`unauthorized`"
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Unprocessable:
+      description: "`validation-failed` or `idempotency-key-reused`"
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Unavailable:
+      description: "`temporarily-unavailable` — retry with the same Idempotency-Key after Retry-After"
+      headers:
+        Retry-After:
+          schema: { type: integer }
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+  schemas:
+    Money:
+      type: object
+      required: [amountMinor, currency]
+      properties:
+        amountMinor: { type: integer, minimum: 0 }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+    PlaceOrder:
+      type: object
+      required: [cartId, lines]
+      properties:
+        cartId: { type: string, format: uuid }
+        reservationId:
+          type: string
+          format: uuid
+          description: "1.3.0 — inventory reservation to commit. Optional; when absent the 1.2.0 behavior applies."
+        lines:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [sku, quantity, unitPrice]
+            properties:
+              sku: { type: string }
+              quantity: { type: integer, minimum: 1 }
+              unitPrice: { $ref: '#/components/schemas/Money' }
+    Order:
+      type: object
+      required: [id, cartId, state, lines, total, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        cartId: { type: string, format: uuid }
+        reservationId: { type: string, format: uuid }
+        state: { type: string, enum: [confirmed] }
+        lines:
+          type: array
+          items:
+            type: object
+            required: [sku, quantity, unitPrice]
+            properties:
+              sku: { type: string }
+              quantity: { type: integer }
+              unitPrice: { $ref: '#/components/schemas/Money' }
+        total: { $ref: '#/components/schemas/Money' }
+        createdAt: { type: string, format: date-time }
+    Problem:
+      type: object
+      description: RFC 9457 problem details. `type` is https://errors.relm.example/orders/<code>.
+      required: [type, title, status]
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }

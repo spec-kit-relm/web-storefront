@@ -1,0 +1,33 @@
+schema_version: "1.0"
+
+preset:
+  id: "relm-frontend"
+  name: "Relm Frontend Team"
+  version: "1.0.0"
+  description: "Relm frontend overlay: constitution Part B (FE-1..FE-6) and frontend plan sections (UI states, accessibility, performance, tracking)."
+  author: "Relm SDD Guild"
+  repository: "https://github.com/spec-kit-relm/speckit-platform"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=1.2.0"
+
+# Install with HIGHER precedence than relm-org (priority 10 vs 20): these templates are
+# appended on top of relm-org's composed templates.
+provides:
+  templates:
+    - type: "template"
+      name: "constitution-template"
+      file: "templates/constitution-template.md"
+      description: "Appends Part B (team overlay) and the Part C skeleton — generated from governance/"
+      strategy: "append"
+
+    - type: "template"
+      name: "plan-template"
+      file: "templates/plan-frontend.md"
+      description: "Appends frontend plan sections"
+      strategy: "append"
+tags:
+  - "relm"
+  - "frontend"
+  - "governance"

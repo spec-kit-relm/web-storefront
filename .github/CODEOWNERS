@@ -1,0 +1,4 @@
+*                    @spec-kit-relm/frontend
+/contracts/vendor/   @spec-kit-relm/frontend
+/.specify/memory/    @spec-kit-relm/frontend @spec-kit-relm/sdd-guild
+/AGENTS.md           @spec-kit-relm/frontend @spec-kit-relm/sdd-guild

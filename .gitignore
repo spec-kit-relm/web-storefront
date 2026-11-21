@@ -1,0 +1,6 @@
+node_modules/
+.next/
+next-env.d.ts
+src/api/generated/
+*.tsbuildinfo
+specs/*/pr-description.md

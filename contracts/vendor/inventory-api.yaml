@@ -1,0 +1,263 @@
+openapi: 3.1.0
+info:
+  title: Relm Inventory API
+  version: 1.1.0
+  description: |
+    Stock availability and checkout reservations ("holds") for Relm Commerce.
+    Owner: inventory-service (@spec-kit-relm/backend). Consumers: orders-service, web-storefront, e2e-tests.
+
+    Semantics (ORG-3, BE-2):
+    - All POST operations require `Idempotency-Key`. Repeating a request with the same key and body
+      within 24 h returns the original response (same status, same body). The same key with a
+      different body returns 422 `idempotency-key-reused`.
+    - A reservation is all-or-nothing: either every line is held or nothing is (409 `insufficient-stock`).
+    - A cart has at most one active reservation. Creating one for a cart replaces the previous one
+      (previous state becomes `replaced`, its units are released immediately).
+    - Reservations expire `ttlSeconds` after creation (900 s in production). Expired units are released
+      within 60 s and `inventory.reservation.expired` is published (see inventory-events.yaml).
+    - `commit` is safe to retry: committing an already committed reservation returns 200 with the
+      same body. Committing an expired or replaced reservation returns 409 `reservation-expired`.
+  contact:
+    name: Relm backend team
+    url: https://github.com/spec-kit-relm/inventory-service
+  license:
+    name: Proprietary
+    identifier: LicenseRef-Relm
+servers:
+  - url: https://inventory.internal.relm.example
+    description: production (internal)
+security:
+  - serviceToken: []
+tags:
+  - name: availability
+    description: Sellable units per SKU
+  - name: reservations
+    description: Checkout holds (RELM-1)
+paths:
+  /v1/items/{sku}/availability:
+    get:
+      tags: [availability]
+      operationId: getAvailability
+      summary: Units available to sell for one SKU (on hand minus active reservations)
+      parameters:
+        - $ref: '#/components/parameters/Sku'
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '200':
+          description: Availability
+          headers:
+            X-Request-Id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Availability' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /v1/reservations:
+    post:
+      tags: [reservations]
+      operationId: createReservation
+      summary: Hold all lines of a cart for ttlSeconds (all-or-nothing)
+      x-relm-scenarios: [RELM-1/US1/AS1, RELM-1/US1/AS2, RELM-1/US1/AS4]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateReservation' }
+      responses:
+        '201':
+          description: Reservation created (or replayed for the same Idempotency-Key)
+          headers:
+            X-Request-Id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '409':
+          description: "`insufficient-stock` — nothing was held; `shortages` lists available units per SKU"
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/InsufficientStockProblem' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /v1/reservations/{reservationId}:
+    get:
+      tags: [reservations]
+      operationId: getReservation
+      summary: Current state and remaining time of a reservation
+      x-relm-scenarios: [RELM-1/US1/AS3, RELM-1/US3/AS2]
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '200':
+          description: Reservation
+          headers:
+            X-Request-Id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /v1/reservations/{reservationId}/commit:
+    post:
+      tags: [reservations]
+      operationId: commitReservation
+      summary: Convert an active reservation into a permanent stock deduction (idempotent)
+      x-relm-scenarios: [RELM-1/US2/AS1, RELM-1/US2/AS3]
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CommitReservation' }
+      responses:
+        '200':
+          description: Committed (also returned when already committed with the same orderId)
+          headers:
+            X-Request-Id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '409':
+          description: "`reservation-expired` — the reservation is expired or replaced; nothing was deducted"
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+components:
+  securitySchemes:
+    serviceToken:
+      type: http
+      scheme: bearer
+      description: Service-to-service token (orders-service) or storefront BFF token with scope `inventory:reserve`.
+  parameters:
+    Sku:
+      name: sku
+      in: path
+      required: true
+      schema: { type: string, pattern: '^[A-Z0-9-]{3,32}$' }
+    ReservationId:
+      name: reservationId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: Client-generated UUID; replays within 24 h return the original response (BE-2).
+      schema: { type: string, format: uuid }
+    RequestId:
+      name: X-Request-Id
+      in: header
+      required: false
+      schema: { type: string }
+  headers:
+    RequestId:
+      description: Echoed or generated request ID (BE-1)
+      schema: { type: string }
+  responses:
+    NotFound:
+      description: "`not-found`"
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Unauthorized:
+      description: "`unauthorized`"
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Unprocessable:
+      description: "`validation-failed` or `idempotency-key-reused`"
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Unavailable:
+      description: "`temporarily-unavailable` — safe to retry with the same Idempotency-Key after Retry-After"
+      headers:
+        Retry-After:
+          schema: { type: integer }
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+  schemas:
+    Availability:
+      type: object
+      required: [sku, available]
+      properties:
+        sku: { type: string }
+        available: { type: integer, minimum: 0 }
+    CreateReservation:
+      type: object
+      required: [cartId, lines]
+      properties:
+        cartId: { type: string, format: uuid }
+        lines:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            type: object
+            required: [sku, quantity]
+            properties:
+              sku: { type: string }
+              quantity: { type: integer, minimum: 1, maximum: 99 }
+    CommitReservation:
+      type: object
+      required: [orderId]
+      properties:
+        orderId: { type: string, format: uuid }
+    Reservation:
+      type: object
+      required: [id, cartId, state, lines, createdAt, expiresAt, remainingSeconds]
+      properties:
+        id: { type: string, format: uuid }
+        cartId: { type: string, format: uuid }
+        state: { type: string, enum: [active, committed, expired, replaced] }
+        lines:
+          type: array
+          items:
+            type: object
+            required: [sku, quantity]
+            properties:
+              sku: { type: string }
+              quantity: { type: integer }
+        createdAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+        remainingSeconds:
+          type: integer
+          minimum: 0
+          description: Seconds until expiry at response time; 0 unless state is active.
+        orderId: { type: string, format: uuid, description: Set when committed }
+    Problem:
+      type: object
+      description: RFC 9457 problem details. `type` is https://errors.relm.example/inventory/<code>.
+      required: [type, title, status]
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        instance: { type: string }
+    InsufficientStockProblem:
+      allOf:
+        - $ref: '#/components/schemas/Problem'
+        - type: object
+          required: [shortages]
+          properties:
+            shortages:
+              type: array
+              items:
+                type: object
+                required: [sku, requested, available]
+                properties:
+                  sku: { type: string }
+                  requested: { type: integer }
+                  available: { type: integer }

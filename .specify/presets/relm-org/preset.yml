@@ -1,0 +1,71 @@
+schema_version: "1.0"
+
+preset:
+  id: "relm-org"
+  name: "Relm Organization Baseline"
+  version: "1.0.0"
+  description: "Relm org-wide SDD standard: constitution Part A, traceability in specs, delivery sections in plans, mandatory verification phase in tasks."
+  author: "Relm SDD Guild"
+  repository: "https://github.com/spec-kit-relm/speckit-platform"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=1.2.0"
+
+# Install with LOWER precedence than the team presets (priority 20 vs 10) so team presets can
+# append to what this preset provides.
+provides:
+  templates:
+    - type: "template"
+      name: "constitution-template"
+      file: "templates/constitution-template.md"
+      description: "Relm constitution skeleton with Part A (org baseline) — generated from governance/"
+      replaces: "constitution-template"
+
+    - type: "template"
+      name: "spec-template"
+      file: "templates/spec-traceability.md"
+      description: "Appends the mandatory Relm Traceability section (Feature ID, central spec, contracts)"
+      strategy: "append"
+
+    - type: "template"
+      name: "plan-template"
+      file: "templates/plan-delivery.md"
+      description: "Appends Relm delivery sections: contracts & versions, observability, flags & rollout, security"
+      strategy: "append"
+
+    - type: "template"
+      name: "tasks-template"
+      file: "templates/tasks-verification.md"
+      description: "Appends the mandatory Relm verification & handoff phase"
+      strategy: "append"
+
+    - type: "command"
+      name: "speckit.specify"
+      file: "commands/speckit.specify.md"
+      description: "Wraps /speckit.specify with Relm feature-ID numbering and central-spec handoff"
+      strategy: "wrap"
+
+    - type: "command"
+      name: "speckit.plan"
+      file: "commands/speckit.plan.md"
+      description: "Wraps /speckit.plan with contract-first rules and the contract registry lookup"
+      strategy: "wrap"
+
+    - type: "command"
+      name: "speckit.tasks"
+      file: "commands/speckit.tasks.md"
+      description: "Wraps /speckit.tasks with mandatory contract-test and scenario-ID rules"
+      strategy: "wrap"
+
+    - type: "command"
+      name: "speckit.implement"
+      file: "commands/speckit.implement.md"
+      description: "Wraps /speckit.implement with scoped runs and read-only vendored contracts"
+      strategy: "wrap"
+
+tags:
+  - "relm"
+  - "governance"
+  - "traceability"
+  - "contract-first"
