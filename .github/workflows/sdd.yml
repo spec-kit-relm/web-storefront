@@ -8,6 +8,12 @@ on:
   push:
     branches: [main]
 
+# The reusable gates read the repo and the PR payload; grant exactly that (the org default
+# token has no pull-requests scope, and a called workflow cannot exceed its caller).
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   sdd:
     uses: spec-kit-relm/speckit-platform/.github/workflows/sdd-gates.yml@v1
