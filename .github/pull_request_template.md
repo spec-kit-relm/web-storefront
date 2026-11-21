@@ -23,7 +23,7 @@ Feature: RELM-<n>
 - /speckit.analyze: <!-- paste the summary, e.g. "0 CRITICAL · 1 HIGH · 3 MEDIUM" -->
 - /speckit.converge: <!-- "Converged", or the open convergence tasks (then this PR is not ready) -->
 - Tests: <!-- unit ✔ integration ✔ contract (provider/consumer) ✔ -->
-- Scenario IDs covered: <!-- RELM-1/US1/AS1, RELM-1/US1/AS2 -->
+- Scenario IDs covered: <!-- RELM-<n>/US1/AS1, RELM-<n>/US1/AS2 -->
 
 ## Constitution
 - Org baseline: v1.0.0 · Team overlay: v1.0.0 · Repo amendments: v<x.y.z>
