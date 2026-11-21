@@ -1,12 +1,12 @@
 ---
-description: "Task list for RELM-1 stock reservation — web-storefront slice"
+description: "Task list for RELM-2 stock reservation — web-storefront slice"
 ---
 
 # Tasks: Stock reservation at checkout — storefront slice
 
-**Input**: Design documents from `/specs/001-stock-reservation/`
+**Input**: Design documents from `/specs/002-stock-reservation/`
 
-**Prerequisites**: plan.md, spec.md, research.md, vendored contracts inventory-api 1.1.0 + orders-api 1.3.0 (locked)
+**Prerequisites**: plan.md, spec.md, research.md, vendored contracts inventory-api 1.1.1 + orders-api 1.3.1 (locked)
 
 **Tests**: Mandatory at Relm (ORG-4). Component tests include axe assertions (FE-1).
 
@@ -40,10 +40,10 @@ description: "Task list for RELM-1 stock reservation — web-storefront slice"
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T011 [P] [US1] Component test `RELM-1/US1/AS1 HoldNotice shows 15:00 and counts down` + axe
-- [ ] T012 [P] [US1] Component test `RELM-1/US1/AS2 ShortageList shows available quantity with Use N` + axe
-- [ ] T013 [P] [US1] Page test `RELM-1/US1/AS3 reload reuses reservation and remaining time` (mocked API wrapper)
-- [ ] T014 [P] [US1] Page test `WEB/RELM-1/US1/AS4 flag off renders today's checkout`
+- [ ] T011 [P] [US1] Component test `RELM-2/US1/AS1 HoldNotice shows 15:00 and counts down` + axe
+- [ ] T012 [P] [US1] Component test `RELM-2/US1/AS2 ShortageList shows available quantity with Use N` + axe
+- [ ] T013 [P] [US1] Page test `RELM-2/US1/AS3 reload reuses reservation and remaining time` (mocked API wrapper)
+- [ ] T014 [P] [US1] Page test `WEB/RELM-2/US1/AS4 flag off renders today's checkout`
 - [ ] T015 [P] [US1] Component test: live region announces only at 5:00, 1:00, 0:00 (FR-006)
 
 ### Implementation for User Story 1
@@ -59,9 +59,9 @@ description: "Task list for RELM-1 stock reservation — web-storefront slice"
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T020 [P] [US2] Component test `RELM-1/US2/AS2 double click sends one attempt key and shows one confirmation`
-- [ ] T021 [P] [US2] Component test `RELM-1/US2/AS3 reservation-expired shows message and Start again` + axe
-- [ ] T022 [P] [US2] Component test `WEB/RELM-1/US2/AS3 503 shows retry and reuses the attempt key`
+- [ ] T020 [P] [US2] Component test `RELM-2/US2/AS2 double click sends one attempt key and shows one confirmation`
+- [ ] T021 [P] [US2] Component test `RELM-2/US2/AS3 reservation-expired shows message and Start again` + axe
+- [ ] T022 [P] [US2] Component test `WEB/RELM-2/US2/AS3 503 shows retry and reuses the attempt key`
 
 ### Implementation for User Story 2
 
@@ -73,8 +73,8 @@ description: "Task list for RELM-1 stock reservation — web-storefront slice"
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T024 [P] [US3] Page test `RELM-1/US3/AS2 expired reservation on return shows expired state, order disabled` + axe
-- [ ] T025 [P] [US3] Component test `WEB/RELM-1/US3/AS2 timer reaching zero switches to expired without reload`
+- [ ] T024 [P] [US3] Page test `RELM-2/US3/AS2 expired reservation on return shows expired state, order disabled` + axe
+- [ ] T025 [P] [US3] Component test `WEB/RELM-2/US3/AS2 timer reaching zero switches to expired without reload`
 
 ### Implementation for User Story 3
 
@@ -93,7 +93,7 @@ description: "Task list for RELM-1 stock reservation — web-storefront slice"
 ## Phase R: Relm Verification & Handoff *(mandatory, always the last phase — ORG-3, ORG-4, ORG-9, PRD-6)*
 
 - [ ] TR01 Provider verification and consumer contract tests pass against the locked contract versions, including negative cases
-- [ ] TR02 Every acceptance scenario `RELM-1/US<k>/AS<m>` in scope has an automated test whose title starts with that ID
+- [ ] TR02 Every acceptance scenario `RELM-2/US<k>/AS<m>` in scope has an automated test whose title starts with that ID
 - [ ] TR03 Feature flag defaults to off; rollback steps from plan.md verified in a non-production environment
 - [ ] TR04 Run `/speckit.converge`; resolve every appended convergence task until it reports **Converged**
 - [ ] TR05 If shipped behavior or contract versions differ from the central spec, open a PR in `product-specs` updating `spec.md` / `contracts.lock.md`

@@ -1,12 +1,12 @@
 # Feature Specification: Stock reservation at checkout — storefront slice
 
-**Feature Branch**: `001-stock-reservation`
+**Feature Branch**: `002-stock-reservation`
 
 **Created**: 2026-11-20
 
 **Status**: Approved
 
-**Input**: User description: "RELM-1 stock-reservation: web-storefront slice from the handoff brief — when the shopper starts checkout, hold the cart, show how long the hold lasts, explain shortages, place the order against the hold exactly once, and show an expired state with a way to start again. Everything behind a switch that can be turned on for a percentage of shoppers."
+**Input**: User description: "RELM-2 stock-reservation: web-storefront slice from the handoff brief — when the shopper starts checkout, hold the cart, show how long the hold lasts, explain shortages, place the order against the hold exactly once, and show an expired state with a way to start again. Everything behind a switch that can be turned on for a percentage of shoppers."
 
 ## Clarifications
 
@@ -29,9 +29,9 @@ The shopper opens checkout and sees that items are held and for how long.
 
 **Acceptance Scenarios**:
 
-1. **Given** an in-stock cart and the switch on, **When** the shopper opens checkout, **Then** a notice says items are held and shows the remaining time starting at 15:00. *[RELM-1/US1/AS1]*
-2. **Given** a cart where one item is short, **When** the shopper opens checkout, **Then** the short item shows how many are available with an option to use that quantity, and no timer is shown. *[RELM-1/US1/AS2]*
-3. **Given** an active hold, **When** the shopper reloads checkout, **Then** the same remaining time is shown (not reset). *[RELM-1/US1/AS3]*
+1. **Given** an in-stock cart and the switch on, **When** the shopper opens checkout, **Then** a notice says items are held and shows the remaining time starting at 15:00. *[RELM-2/US1/AS1]*
+2. **Given** a cart where one item is short, **When** the shopper opens checkout, **Then** the short item shows how many are available with an option to use that quantity, and no timer is shown. *[RELM-2/US1/AS2]*
+3. **Given** an active hold, **When** the shopper reloads checkout, **Then** the same remaining time is shown (not reset). *[RELM-2/US1/AS3]*
 4. **Given** the switch off, **When** the shopper opens checkout, **Then** today's checkout is shown with no hold notice.
 
 ---
@@ -46,8 +46,8 @@ Placing the order uses the hold, and repeated clicks never produce two orders.
 
 **Acceptance Scenarios**:
 
-1. **Given** an active hold, **When** the shopper clicks "Place order" twice quickly, **Then** one confirmation page is shown for one order. *[RELM-1/US2/AS2]*
-2. **Given** the hold expired, **When** the shopper places the order, **Then** a message says the hold expired and offers "Start checkout again". *[RELM-1/US2/AS3]*
+1. **Given** an active hold, **When** the shopper clicks "Place order" twice quickly, **Then** one confirmation page is shown for one order. *[RELM-2/US2/AS2]*
+2. **Given** the hold expired, **When** the shopper places the order, **Then** a message says the hold expired and offers "Start checkout again". *[RELM-2/US2/AS3]*
 3. **Given** a temporary failure, **When** the shopper places the order, **Then** a retry message is shown and retrying does not create a second order.
 
 ---
@@ -62,7 +62,7 @@ A shopper who comes back after the hold expired understands what happened and ca
 
 **Acceptance Scenarios**:
 
-1. **Given** the hold expired while the shopper was away, **When** checkout is shown, **Then** the expired state is shown with "Start checkout again" and the order button is disabled. *[RELM-1/US3/AS2]*
+1. **Given** the hold expired while the shopper was away, **When** checkout is shown, **Then** the expired state is shown with "Start checkout again" and the order button is disabled. *[RELM-2/US3/AS2]*
 2. **Given** the timer reaches zero while the shopper is on the page, **When** it hits zero, **Then** the page switches to the expired state without a reload.
 
 ---
@@ -105,15 +105,15 @@ A shopper who comes back after the hold expired understands what happened and ca
 
 ## Relm Traceability *(mandatory — ORG-1, PRD-1, QA-2)*
 
-**Feature ID**: RELM-1
-**Central spec**: [product-specs/specs/001-stock-reservation/spec.md](https://github.com/spec-kit-relm/product-specs/blob/main/specs/001-stock-reservation/spec.md)
+**Feature ID**: RELM-2
+**Central spec**: [product-specs/specs/002-stock-reservation/spec.md](https://github.com/spec-kit-relm/product-specs/blob/main/specs/002-stock-reservation/spec.md)
 **Repository role**: consumer
 **Contracts provided**: none
-**Contracts consumed**: inventory-api@1.1.0 (pinned), orders-api@1.3.0 (pinned)
-**Product stories covered**: RELM-1 US1 (AS1–AS3), US2 (AS2, AS3), US3 (AS2)
+**Contracts consumed**: inventory-api@1.1.1 (pinned), orders-api@1.3.1 (pinned)
+**Product stories covered**: RELM-2 US1 (AS1–AS3), US2 (AS2, AS3), US3 (AS2)
 
 **Status lifecycle**: Draft → In Review → Approved → Implemented → Released
 
 ### Scenario IDs
 Central scenario IDs in brackets. Repository-only scenarios (US1 AS4, US2 AS3, US3 AS2) use
-`WEB/RELM-1/US<k>/AS<m>` in test titles.
+`WEB/RELM-2/US<k>/AS<m>` in test titles.
